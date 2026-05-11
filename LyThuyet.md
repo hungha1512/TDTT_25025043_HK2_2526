@@ -481,3 +481,327 @@ even_squares = [i ** 2 for i in range(10) if i % 2 == 0]
 | `while True` + `break` | Mô phỏng `do-while`, chạy ít nhất 1 lần |
 | List comprehension | Tạo list ngắn gọn từ vòng lặp |
 
+
+# Hàm (Function) trong Python
+
+Hàm là một **khối lệnh được đặt tên**, dùng để thực hiện một nhiệm vụ cụ thể. Thay vì viết lại code nhiều lần, ta định nghĩa hàm một lần và gọi lại bất kỳ lúc nào.
+
+---
+
+## 1. Định nghĩa và gọi hàm
+
+```
+def tên_hàm(tham_số_1, tham_số_2, ...):
+    <khối lệnh>
+    return <giá trị>   # tuỳ chọn
+```
+
+```python
+def chao(ten):
+    print(f"Xin chào, {ten}!")
+
+chao("An")   # Xin chào, An!
+```
+
+> **Lưu ý:** Hàm không có `return` sẽ tự động trả về `None`.
+
+---
+
+## 2. Tham số và đối số
+
+| Khái niệm | Ý nghĩa |
+|-----------|---------|
+| **Tham số (parameter)** | Biến được khai báo trong `def` |
+| **Đối số (argument)** | Giá trị thực tế truyền vào khi gọi hàm |
+
+```python
+def cong(a, b):       # a, b là tham số
+    return a + b
+
+ket_qua = cong(3, 5)  # 3, 5 là đối số  →  ket_qua = 8
+```
+
+### Tham số mặc định (Default parameter)
+
+```python
+def luy_thua(co_so, so_mu=2):   # so_mu mặc định là 2
+    return co_so ** so_mu
+
+print(luy_thua(3))     # 9   (3^2)
+print(luy_thua(3, 3))  # 27  (3^3)
+```
+
+---
+
+## 3. Câu lệnh `return`
+
+- Trả về giá trị cho nơi gọi hàm và **kết thúc hàm ngay lập tức**.
+- Có thể trả về **nhiều giá trị** cùng lúc (dưới dạng tuple).
+
+```python
+def tinh_chia(a, b):
+    thuong = a // b
+    du = a % b
+    return thuong, du   # trả về tuple (thuong, du)
+
+q, r = tinh_chia(10, 3)
+print(q, r)   # 3  1
+```
+
+---
+
+## 4. Type Hint (Gợi ý kiểu dữ liệu)
+
+Python cho phép ghi chú kiểu dữ liệu của tham số và giá trị trả về — giúp code dễ đọc hơn, **không bắt buộc**.
+
+```python
+from typing import Tuple
+
+def max_of_two(a: int, b: int) -> int:
+    return a if a > b else b
+
+def swap(a: int, b: int) -> Tuple[int, int]:
+    return b, a
+```
+
+| Cú pháp | Ý nghĩa |
+|---------|---------|
+| `a: int` | Tham số `a` có kiểu `int` |
+| `-> int` | Hàm trả về kiểu `int` |
+| `-> Tuple[int, int]` | Hàm trả về tuple gồm 2 số nguyên |
+| `-> bool` | Hàm trả về `True` hoặc `False` |
+
+---
+
+## 5. Phạm vi biến (Scope)
+
+- Biến khai báo **bên trong hàm** (local) chỉ tồn tại trong hàm đó.
+- Biến khai báo **ngoài hàm** (global) có thể đọc bên trong hàm, nhưng muốn thay đổi phải dùng từ khoá `global`.
+
+```python
+x = 10   # biến global
+
+def ham():
+    y = 5      # biến local, chỉ sống trong ham()
+    print(x)   # đọc được biến global
+    print(y)
+
+ham()
+# print(y)  # Lỗi! y không tồn tại ngoài ham()
+```
+
+---
+
+## 6. Hàm và một số bài toán thường gặp
+
+### 6.1. Tìm số lớn hơn trong hai số
+
+```python
+def max_of_two(a: int, b: int) -> int:
+    return a if a > b else b
+```
+
+### 6.2. Hoán đổi hai biến
+
+```python
+def swap(a: int, b: int):
+    return b, a   # trả về tuple đã đổi chỗ
+
+a, b = swap(3, 7)
+print(a, b)   # 7  3
+```
+
+### 6.3. Kiểm tra số nguyên tố
+
+Số nguyên tố là số lớn hơn 1, **chỉ chia hết cho 1 và chính nó**.
+
+```python
+def is_prime(n: int) -> bool:
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):   # chỉ cần kiểm tra đến căn bậc hai
+        if n % i == 0:
+            return False
+    return True
+
+print(is_prime(7))   # True
+print(is_prime(9))   # False  (9 = 3×3)
+```
+
+> **Mẹo tối ưu:** Chỉ cần kiểm tra đến `√n` vì nếu `n` có ước > `√n`, thì ước còn lại phải < `√n` và đã được kiểm tra rồi.
+
+### 6.4. Kiểm tra số hoàn hảo
+
+Số hoàn hảo là số bằng **tổng tất cả ước số thực sự** (ước số trừ chính nó). Ví dụ: 6 = 1 + 2 + 3.
+
+```python
+def is_perfect(n: int) -> bool:
+    if n < 2:
+        return False
+    tong = sum(i for i in range(1, n) if n % i == 0)
+    return tong == n
+
+print(is_perfect(6))    # True   (1+2+3 = 6)
+print(is_perfect(28))   # True   (1+2+4+7+14 = 28)
+print(is_perfect(12))   # False
+```
+
+### 6.5. Tính giai thừa
+
+```python
+def factorial(n: int) -> int:
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+print(factorial(5))   # 120  (5! = 1×2×3×4×5)
+```
+
+### 6.6. Tìm kiếm trong list
+
+```python
+def tim_vi_tri(lst: list, k: int) -> int:
+    for i in range(len(lst)):
+        if lst[i] == k:
+            return i   # trả về vị trí đầu tiên tìm thấy
+    return -1          # không tìm thấy
+
+print(tim_vi_tri([3, 7, 2, 7], 7))   # 1
+print(tim_vi_tri([3, 7, 2, 7], 9))   # -1
+```
+
+### 6.7. Tổng các chữ số
+
+```python
+def digit_sum(n: int) -> int:
+    tong = 0
+    n = abs(n)          # xử lý số âm
+    while n > 0:
+        tong += n % 10  # lấy chữ số cuối
+        n //= 10        # bỏ chữ số cuối
+    return tong
+
+print(digit_sum(1234))   # 10  (1+2+3+4)
+```
+
+### 6.8. Khoảng cách Hamming
+
+Khoảng cách Hamming giữa hai số nguyên = **số vị trí bit khác nhau** trong biểu diễn nhị phân của chúng.
+
+```python
+def hamming_distance(x: int, y: int) -> int:
+    xor = x ^ y         # XOR: bit = 1 ở những vị trí khác nhau
+    dem = 0
+    while xor > 0:
+        dem += xor & 1  # kiểm tra bit cuối
+        xor >>= 1       # dịch phải 1 bit
+    return dem
+
+# Hoặc ngắn gọn hơn:
+def hamming_distance(x: int, y: int) -> int:
+    return bin(x ^ y).count('1')
+
+print(hamming_distance(1, 4))   # 2  (001 XOR 100 = 101 → có 2 bit 1)
+```
+
+> **Giải thích phép tính bit:**
+> - `^` (XOR): kết quả là `1` tại những vị trí hai bit **khác nhau**.
+> - `bin(n)` chuyển số nguyên sang chuỗi nhị phân, ví dụ `bin(5)` → `'0b101'`.
+> - `.count('1')` đếm số bit `1` trong chuỗi.
+
+### 6.9. Kiểm tra hai từ đẳng cấu (Isomorphic)
+
+Hai từ đẳng cấu nếu có thể ánh xạ 1-1 các ký tự tương ứng.
+
+```python
+def is_isomorphic(a: str, b: str) -> bool:
+    if len(a) != len(b):
+        return False
+    map_ab = {}   # ánh xạ từ a sang b
+    map_ba = {}   # ánh xạ từ b sang a (để đảm bảo 1-1)
+    for ca, cb in zip(a, b):
+        if ca in map_ab and map_ab[ca] != cb:
+            return False
+        if cb in map_ba and map_ba[cb] != ca:
+            return False
+        map_ab[ca] = cb
+        map_ba[cb] = ca
+    return True
+
+print(is_isomorphic("abca", "zbxz"))   # True
+print(is_isomorphic("ab", "aa"))       # False
+```
+
+### 6.10. Kiểm tra tam giác vuông
+
+Ba cạnh a, b, c tạo thành tam giác vuông nếu bình phương cạnh lớn nhất bằng tổng bình phương hai cạnh còn lại (định lý Pythagore).
+
+```python
+def is_right_triangle(a: float, b: float, c: float) -> bool:
+    canh = sorted([a, b, c])   # sắp xếp tăng dần
+    return canh[2] ** 2 == canh[0] ** 2 + canh[1] ** 2
+
+print(is_right_triangle(3, 4, 5))    # True   (9 + 16 = 25)
+print(is_right_triangle(1, 2, 3))   # False
+```
+
+---
+
+## 7. Một số hàm và kỹ thuật hữu ích
+
+### `abs()` — giá trị tuyệt đối
+```python
+print(abs(-5))   # 5
+```
+
+### `round()` — làm tròn số
+```python
+print(round(3.14159, 2))   # 3.14
+```
+
+### `sorted()` — sắp xếp iterable, trả về list mới
+```python
+print(sorted([3, 1, 2]))      # [1, 2, 3]
+print(sorted([3, 1, 2], reverse=True))  # [3, 2, 1]
+```
+
+### `zip()` — ghép các iterable lại từng cặp
+```python
+a = [1, 2, 3]
+b = ['a', 'b', 'c']
+for x, y in zip(a, b):
+    print(x, y)   # 1 a / 2 b / 3 c
+```
+
+### Phép toán bit (Bitwise Operators)
+
+| Toán tử | Ý nghĩa | Ví dụ |
+|---------|---------|-------|
+| `&` | AND bit | `5 & 3` → `1` |
+| `\|` | OR bit | `5 \| 3` → `7` |
+| `^` | XOR bit | `5 ^ 3` → `6` |
+| `~` | NOT bit | `~5` → `-6` |
+| `<<` | Dịch trái | `1 << 2` → `4` |
+| `>>` | Dịch phải | `8 >> 1` → `4` |
+
+```python
+# XOR hữu ích để tìm bit khác nhau
+print(bin(5))      # '0b101'
+print(bin(3))      # '0b011'
+print(bin(5 ^ 3))  # '0b110'  → vị trí bit khác nhau
+```
+
+---
+
+## Tóm tắt nhanh
+
+| Khái niệm | Cú pháp |
+|-----------|---------|
+| Định nghĩa hàm | `def tên(tham_số):` |
+| Trả về giá trị | `return giá_trị` |
+| Trả về nhiều giá trị | `return a, b` → nhận bằng `x, y = hàm()` |
+| Type hint | `def f(a: int) -> bool:` |
+| Tham số mặc định | `def f(a, b=10):` |
+| Import kiểu | `from typing import Tuple, List` |
+
