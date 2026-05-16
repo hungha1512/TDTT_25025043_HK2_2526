@@ -805,3 +805,221 @@ print(bin(5 ^ 3))  # '0b110'  → vị trí bit khác nhau
 | Tham số mặc định | `def f(a, b=10):` |
 | Import kiểu | `from typing import Tuple, List` |
 
+
+# List, Tuple, Dict trong Python
+
+Ba cấu trúc dữ liệu cơ bản nhất là `list`, `tuple`, `dict`. Chúng đều là kiểu dữ liệu *iterable* và thường xuyên xuất hiện trong bài tập.
+
+---
+
+## 1. List (Danh sách)
+
+**List** là dãy phần tử *có thứ tự* và *có thể thay đổi* (mutable).
+
+### Cách tạo list
+
+```python
+nums = [1, 2, 3, 4]
+words = ["python", "java", "c++"]
+mix = [1, "a", 3.5, True]
+empty = []
+```
+
+### Truy cập phần tử và cắt (slicing)
+
+```python
+nums = [10, 20, 30, 40, 50]
+print(nums[0])    # 10
+print(nums[-1])   # 50 (phần tử cuối)
+
+print(nums[1:4])  # [20, 30, 40]
+print(nums[:3])   # [10, 20, 30]
+print(nums[::2])  # [10, 30, 50]
+```
+
+### Thao tác thường dùng
+
+```python
+nums = [1, 2, 3]
+nums.append(4)       # [1, 2, 3, 4]
+nums.insert(1, 99)   # [1, 99, 2, 3, 4]
+nums.remove(99)      # xoá phần tử đầu tiên có giá trị 99
+nums.pop()           # xoá phần tử cuối
+nums.extend([5, 6])  # nối thêm list
+```
+
+### Duyệt list
+
+```python
+nums = [3, 5, 7]
+for x in nums:
+    print(x)
+
+for i, x in enumerate(nums):
+    print(i, x)   # in ra cả vị trí và giá trị
+```
+
+### Một số hàm hay dùng
+
+```python
+nums = [5, 1, 9]
+print(len(nums))   # 3
+print(sum(nums))   # 15
+print(max(nums))   # 9
+print(min(nums))   # 1
+
+nums.sort()        # sắp xếp tăng dần, thay đổi list gốc
+nums.reverse()     # đảo ngược list
+```
+
+> **Lưu ý:** Khi cần copy list để không ảnh hưởng list gốc, dùng `nums.copy()` hoặc `nums[:]`.
+
+---
+
+## 2. Tuple (Bộ)
+
+**Tuple** là dãy phần tử *có thứ tự* nhưng **không thay đổi được** (immutable).
+
+### Cách tạo tuple
+
+```python
+t = (1, 2, 3)
+t2 = ("a", "b", "c")
+t3 = ()
+t4 = (5,)   # tuple 1 phần tử phải có dấu phẩy
+```
+
+### Truy cập tuple
+
+```python
+t = (10, 20, 30)
+print(t[0])    # 10
+print(t[-1])   # 30
+print(t[1:])   # (20, 30)
+```
+
+### Dùng tuple để trả về nhiều giá trị
+
+```python
+def chia(a, b):
+    return a // b, a % b
+
+q, r = chia(10, 3)
+print(q, r)   # 3 1
+```
+
+> **Khi nào dùng tuple?** Khi dữ liệu *không cần thay đổi*, giúp an toàn và tiết kiệm bộ nhớ hơn list.
+
+---
+
+## 3. Dict (Từ điển)
+
+**Dict** là tập hợp các cặp `key: value`. *Không có thứ tự vị trí theo chỉ số* (nhưng từ Python 3.7+ dict giữ thứ tự thêm vào).
+
+### Cách tạo dict
+
+```python
+student = {"name": "An", "age": 20}
+scores = {1: "A", 2: "B"}
+empty = {}
+```
+
+### Truy cập và cập nhật
+
+```python
+student = {"name": "An", "age": 20}
+print(student["name"])    # An
+
+student["age"] = 21       # cập nhật
+student["city"] = "HCM"  # thêm mới
+```
+
+### Duyệt dict
+
+```python
+student = {"name": "An", "age": 20}
+
+for key in student:
+    print(key, student[key])
+
+for key, value in student.items():
+    print(key, value)
+```
+
+### Một số thao tác phổ biến
+
+```python
+student = {"name": "An", "age": 20}
+
+print(student.get("name"))       # An (an toàn hơn [] nếu key không tồn tại)
+print("age" in student)          # True
+
+student.pop("age")               # xoá key age
+student.update({"grade": "A"})  # thêm nhiều key
+```
+
+### Đếm số lần xuất hiện bằng dict
+
+```python
+nums = [1, 2, 1, 3, 2, 1]
+count = {}
+for x in nums:
+    count[x] = count.get(x, 0) + 1
+
+print(count)   # {1: 3, 2: 2, 3: 1}
+```
+
+---
+
+## 4. Set (Tập hợp)
+
+**Set** là tập hợp các phần tử *không trùng nhau* và *không có thứ tự*.
+
+### Cách tạo set
+
+```python
+nums = {1, 2, 3}
+chars = set(["a", "b", "c"])
+empty = set()  # không dùng {} vì đó là dict rỗng
+```
+
+### Thao tác cơ bản
+
+```python
+nums = {1, 2, 3}
+nums.add(4)          # thêm phần tử
+nums.remove(2)       # xoá phần tử (lỗi nếu không tồn tại)
+nums.discard(10)     # xoá an toàn, không lỗi
+```
+
+### Toán tử tập hợp
+
+```python
+a = {1, 2, 3}
+b = {3, 4, 5}
+
+print(a | b)  # hợp: {1, 2, 3, 4, 5}
+print(a & b)  # giao: {3}
+print(a - b)  # hiệu: {1, 2}
+print(a ^ b)  # đối xứng: {1, 2, 4, 5}
+```
+
+> **Khi nào dùng set?** Khi cần loại bỏ trùng lặp, kiểm tra tồn tại nhanh, hoặc làm các phép toán tập hợp.
+
+---
+
+## 5. So sánh nhanh
+
+| Kiểu | Có thứ tự | Thay đổi được | Truy cập | Ví dụ |
+|------|-----------|---------------|----------|-------|
+| List | Có | Có | theo chỉ số | `[1, 2, 3]` |
+| Tuple | Có | Không | theo chỉ số | `(1, 2, 3)` |
+| Dict | Theo key | Có | theo key | `{ "a": 1 }` |
+| Set | Không | Có | theo phần tử | `{1, 2, 3}` |
+
+> **Mẹo học nhanh:**
+> - List: dùng khi cần thay đổi dữ liệu (thêm, xoá, sửa).
+> - Tuple: dùng khi dữ liệu cố định (toạ độ, trả về nhiều giá trị).
+> - Dict: dùng khi cần tra cứu theo khóa (key) nhanh.
+> - Set: dùng khi cần lọc trùng và kiểm tra tồn tại nhanh.
+
