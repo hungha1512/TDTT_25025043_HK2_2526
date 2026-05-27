@@ -1017,9 +1017,339 @@ print(a ^ b)  # đối xứng: {1, 2, 4, 5}
 | Dict | Theo key | Có | theo key | `{ "a": 1 }` |
 | Set | Không | Có | theo phần tử | `{1, 2, 3}` |
 
-> **Mẹo học nhanh:**
-> - List: dùng khi cần thay đổi dữ liệu (thêm, xoá, sửa).
-> - Tuple: dùng khi dữ liệu cố định (toạ độ, trả về nhiều giá trị).
-> - Dict: dùng khi cần tra cứu theo khóa (key) nhanh.
-> - Set: dùng khi cần lọc trùng và kiểm tra tồn tại nhanh.
+---
 
+# Mảng 2 chiều (2D List) trong Python
+
+Mảng 2 chiều thực chất là **một mảng chứa nhiều mảng** (hay gọi là 1 list chứa một hoặc nhiều list con). Chúng ta thường dùng nó để biểu diễn ma trận hoặc dữ liệu dạng hàng và cột.
+
+---
+
+## 1. Khởi tạo và truy cập mảng 2 chiều
+
+Ta có thể khởi tạo mảng 2 chiều bằng cách viết trên nhiều dòng cho trực quan hoặc trên một dòng.
+
+```python
+# Ma trận vuông 3x3
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]   
+]
+
+matrix_2 = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+# Truy cập phần tử: matrix[chỉ_số_hàng][chỉ_số_cột]
+# Lấy phần tử có giá trị 2 trong list matrix
+print(matrix[0][1])      # Kết quả: 2 (hàng 0, cột 1)
+
+# Lấy phần tử có giá trị 7 trong list matrix_2
+print(matrix_2[2][0])    # Kết quả: 7 (hàng 2, cột 0)
+
+matrix_3 = [[1, 2, 3, [4, 5, 6, [7, 8, 9]]]]
+# Lấy phần tử có giá trị 8 trong list matrix_3
+print(matrix_3[0][3][3][1])  # Kết quả: 8
+```
+
+---
+
+## 2. Duyệt mảng 2 chiều
+
+Dùng **vòng lặp lồng nhau** để duyệt mảng 2 (hay nhiều) chiều.
+
+### 2.1. Duyệt theo hàng
+Duyệt trực tiếp qua từng phần tử hàng, sau đó duyệt từng item trong hàng đó.
+```python
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]   
+]
+
+# Duyệt theo hàng
+for row in matrix:
+    for item in row:
+        print(item, end=" ")
+    print()
+# Kết quả in ra:
+# 1 2 3 
+# 4 5 6 
+# 7 8 9 
+```
+
+### 2.2. Duyệt theo chỉ số (đối với mảng đồng nhất độ dài)
+Duyệt qua số lượng hàng và cột của ma trận.
+```python
+# Duyệt theo chỉ số
+rows = len(matrix)
+cols = len(matrix[0])
+for i in range(rows):
+    for j in range(cols):
+        print(f"Phần tử tại [{i}][{j}] của matrix là {matrix[i][j]}")
+```
+
+### 2.3. Duyệt theo chỉ số với mảng con không đồng nhất độ dài
+Khi các hàng có số cột khác nhau, ta phải dùng `len(matrix_2[i])` để lấy số cột riêng của từng hàng.
+```python
+matrix_2 = [
+    [1, 2, 3, 11, 12],
+    [4, 5, 6, 10],
+    [7, 8, 9]   
+]
+
+for i in range(len(matrix_2)):
+    for j in range(len(matrix_2[i])):
+        print(f"Phần tử tại [{i}][{j}] của matrix_2 là {matrix_2[i][j]}")
+```
+
+---
+
+## 3. Các thao tác hay gặp trên mảng 2 chiều
+
+### 3.1. Làm phẳng mảng (Flattening)
+Chuyển từ mảng 2 chiều thành mảng 1 chiều. Có 3 cách thường dùng:
+
+```python
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+# Cách 1: Làm phẳng bằng vòng lặp và append()
+result = []
+for row in matrix:
+    for item in row:
+        result.append(item)
+print(result)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Cách 2: Làm phẳng bằng vòng lặp và extend()
+result_2 = []
+for row in matrix:
+    result_2.extend(row)
+print(result_2)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Cách 3: Làm phẳng bằng List Comprehension (Ngắn gọn nhất)
+result_3 = [item for row in matrix for item in row]
+print(result_3)  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+### 3.2. Tính tổng hàng
+```python
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]   
+]
+
+# Cách 1: Duyệt trực tiếp qua từng hàng để tính tổng
+count = 1
+for row in matrix:
+    sum_val = 0
+    for item in row:
+        sum_val += item
+    print(f"Tong cua hang {count} la: {sum_val}")
+    count += 1
+
+# Cách 2: Viết hàm tính tổng của hàng thứ k (chỉ số 1-based)
+def tong_hang(matrix, k):
+    sum_val = 0
+    for i in range(len(matrix[k-1])):
+        sum_val += matrix[k-1][i]
+    return sum_val
+
+print(tong_hang(matrix, 3))  # Kết quả: 24 (Tổng hàng 3: 7 + 8 + 9)
+```
+
+### 3.3. Tính tổng cột
+Duyệt qua chỉ số hàng để tính tổng tại một vị trí cột cố định `k` (chỉ số 0-based).
+```python
+def tong_cot(matrix, k):
+    sum_column = 0
+    # Kiểm tra tính hợp lệ của chỉ số cột k
+    if k < 0 or k >= len(matrix):
+        return None
+    for i in range(len(matrix)):
+        sum_column += matrix[i][k]
+    return sum_column
+
+print(tong_cot(matrix, 2))  # Kết quả: 18 (Tổng cột 2: 3 + 6 + 9)
+```
+
+### 3.4. Lưu ý trong ma trận vuông
+Đối với ma trận vuông cấp n x n:
+- **Đường chéo chính:** Các phần tử có chỉ số hàng = chỉ số cột (`i == j`).
+- **Đường chéo phụ:** Các phần tử có chỉ số thỏa mãn `i + j == n - 1` (với n là kích thước ma trận vuông).
+
+---
+
+# Thuật toán Tìm kiếm (Searching)
+
+Dùng để tìm vị trí (chỉ số) của một phần tử mục tiêu trong danh sách.
+
+## 1. Tìm kiếm tuyến tính (Linear Search)
+Duyệt lần lượt qua từng phần tử từ đầu đến cuối cho đến khi tìm thấy mục tiêu thì dừng lại. Dùng cho danh sách **chưa sắp xếp**.
+
+```python
+# Tìm kiếm tuyến tính, dùng cho danh sách chưa sắp xếp
+arr = [2, 4, 5, 3, 1, 7, 9, 10]
+
+def linear_search(arr, tar):
+    for i in range(len(arr)):
+        if arr[i] == tar:
+            return i
+    return -1
+
+print(linear_search(arr, 7))  # Kết quả: 5
+```
+*Độ phức tạp thời gian:* O(n)
+
+## 2. Tìm kiếm nhị phân (Binary Search)
+Chỉ áp dụng cho danh sách **đã sắp xếp**. Nguyên lý: Luôn chia đôi phạm vi tìm kiếm ở mỗi bước.
+
+```python
+# Tìm kiếm nhị phân, chỉ dùng cho danh sách đã sắp xếp
+arr = [1, 2, 3, 4, 4, 5, 6, 7, 8, 8, 9, 10]
+```
+
+### Cách 1: Tìm kiếm nhị phân bằng Đệ quy (Recursive)
+```python
+def binary_search(arr, tar, left, right):
+    # Kiểm tra left và right có hợp lệ không
+    if left > right:
+        return -1
+    
+    mid = (left + right) // 2
+    
+    if arr[mid] == tar:
+        return mid
+    
+    if arr[mid] < tar:
+        left = mid + 1
+    else:
+        right = mid - 1
+        
+    return binary_search(arr, tar, left, right)
+
+print(binary_search(arr, 8, 0, len(arr)-1))  # Kết quả: 8
+```
+
+### Cách 2: Tìm kiếm nhị phân dùng vòng lặp `while` (Iterative)
+```python
+def binary_search_while(arr, tar):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == tar:
+            return mid
+        if arr[mid] < tar:
+            left = mid + 1
+        else: 
+            right = mid - 1
+    return -1
+
+print(binary_search_while(arr, 8))  # Kết quả: 8
+```
+*Độ phức tạp thời gian:* O(log n)
+
+---
+
+# Thuật toán Sắp xếp cơ bản (Sorting)
+
+## 1. Sắp xếp nổi bọt (Bubble Sort)
+So sánh 2 phần tử kề nhau, nếu sai thứ tự thì hoán đổi. Sau mỗi vòng lặp lớn, phần tử lớn nhất sẽ "nổi" dần về cuối dãy.
+
+```python
+arr = [2, 4, 5, 3, 1, 7, 9, 10]
+print(f"Mảng trước khi sắp xếp là: {arr}") 
+
+def bubble_sort(arr):
+    for i in range(len(arr)):
+        for j in range(0, len(arr)-i-1):
+            if arr[j] > arr[j+1]:
+                # Hoán đổi hai phần tử kề nhau
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    return arr
+
+print(f"Mảng sau khi sắp xếp là: {bubble_sort(arr)}")            
+# Kết quả: [1, 2, 3, 4, 5, 7, 9, 10]
+```
+*Độ phức tạp thời gian:* O(n^2)
+
+## 2. Sắp xếp lựa chọn (Selection Sort)
+Tìm phần tử nhỏ nhất (hoặc lớn nhất) trong đoạn chưa sắp xếp và đưa nó về vị trí đang xét đầu đoạn đó. Thuật toán sắp xếp trực tiếp tại chỗ (in-place).
+
+```python
+arr = [2, 4, 5, 3, 1, 7, 9, 10]
+print(f"Mảng trước khi sắp xếp là: {arr}")
+
+def selection_sort(arr):
+    for i in range(len(arr)):
+        min_idx = i
+        for j in range(i+1, len(arr)):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        # Hoán đổi phần tử nhỏ nhất tìm được với phần tử tại vị trí i
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+
+selection_sort(arr)
+print(f"Mảng sau khi sắp xếp là: {arr}")
+# Kết quả: [1, 2, 3, 4, 5, 7, 9, 10]
+```
+*Độ phức tạp thời gian:* O(n^2)
+
+## 3. Sắp xếp chèn (Insertion Sort)
+Xây dựng dãy con đã sắp xếp bằng cách lấy từng phần tử từ dãy chưa sắp xếp và "chèn" vào đúng vị trí của nó trong dãy con đã sắp xếp trước đó.
+
+```python
+arr = [2, 4, 5, 3, 1, 7, 9, 10]
+
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        # Di chuyển các phần tử có giá trị lớn hơn key về sau
+        while j >= 0 and key < arr[j]:
+            arr[j+1] = arr[j]
+            j -= 1
+        arr[j+1] = key
+    return arr     
+
+print(insertion_sort(arr))
+# Kết quả: [1, 2, 3, 4, 5, 7, 9, 10]
+```
+*Độ phức tạp thời gian:* O(n^2)
+
+## 4. Sắp xếp trộn (Merge Sort)
+Sử dụng chiến lược **"Chia để trị" (Divide and Conquer)**. Chia mảng thành 2 nửa, sắp xếp từng nửa rồi trộn (merge) chúng lại.
+
+Trọng tâm trong bài học là **thuật toán trộn 2 mảng đã sắp xếp sẵn** để tạo thành mảng mới:
+
+```python
+# Trộn 2 mảng đã sắp xếp tăng dần
+a = [1, 3, 6, 7, 10, 15, 20, 25]
+b = [2, 4, 5, 8, 9, 1000, 1200]
+res = []
+
+i, j = 0, 0
+# Trộn luân phiên hai mảng
+while i < len(a) and j < len(b):
+    if a[i] < b[j]:
+        res.append(a[i])
+        i += 1
+    else:
+        res.append(b[j])
+        j += 1
+
+# Kiểm tra nếu còn phần tử thừa trên mảng a 
+while i < len(a):
+    res.append(a[i])
+    i += 1
+
+# Kiểm tra nếu còn phần tử thừa trên mảng b
+while j < len(b):
+    res.append(b[j])
+    j += 1  
+
+print(res)
+# Kết quả: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 1000, 1200]
+```
+*Độ phức tạp thời gian:* O(n log n) khi triển khai Merge Sort đầy đủ bằng đệ quy.
+
+---
