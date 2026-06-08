@@ -1,0 +1,4 @@
+apple
+banana
+orange
+new line

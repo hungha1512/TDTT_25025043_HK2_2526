@@ -1352,4 +1352,823 @@ print(res)
 ```
 *Độ phức tạp thời gian:* O(n log n) khi triển khai Merge Sort đầy đủ bằng đệ quy.
 
+### Merge Sort đầy đủ (từ 1 mảng ban đầu — dùng đệ quy)
+
+Ý tưởng:
+1. **Chia (Divide):** tách mảng thành 2 nửa ở vị trí giữa.
+2. **Trị (Conquer):** đệ quy sắp xếp từng nửa.
+3. **Trộn (Merge):** gộp 2 nửa đã sắp xếp lại.
+
+```
+merge_sort([5, 1, 4, 2, 8])
+├── merge_sort([5, 1])
+│   ├── merge_sort([5])  → [5]
+│   ├── merge_sort([1])  → [1]
+│   └── merge([5], [1])  → [1, 5]
+├── merge_sort([4, 2, 8])
+│   ├── merge_sort([4])       → [4]
+│   ├── merge_sort([2, 8])
+│   │   ├── merge_sort([2])   → [2]
+│   │   ├── merge_sort([8])   → [8]
+│   │   └── merge([2], [8])   → [2, 8]
+│   └── merge([4], [2, 8])    → [2, 4, 8]
+└── merge([1, 5], [2, 4, 8])  → [1, 2, 4, 5, 8]
+```
+
+```python
+def merge(a, b):
+    res = []
+    i, j = 0, 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            res.append(a[i])
+            i += 1
+        else:
+            res.append(b[j])
+            j += 1
+    res.extend(a[i:])
+    res.extend(b[j:])
+    return res
+
+def merge_sort(arr):
+    if len(arr) <= 1:          # base case: mảng 0 hoặc 1 phần tử đã sắp xếp
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])   # đệ quy nửa trái
+    right = merge_sort(arr[mid:])  # đệ quy nửa phải
+    return merge(left, right)      # trộn 2 nửa đã sắp
+
+print(merge_sort([5, 1, 4, 2, 8]))  # [1, 2, 4, 5, 8]
+```
+
+> **Base case quan trọng:** `len(arr) <= 1` — mảng 1 phần tử luôn đã sắp xếp, đệ quy dừng ở đây.
+
 ---
+
+# Class (Lớp) trong Python
+
+**Class** là bản thiết kế (blueprint) để tạo ra các **object** (đối tượng). Mỗi object có thuộc tính (attribute) và phương thức (method) riêng.
+
+---
+
+## 1. Định nghĩa Class và tạo Object
+
+```python
+class Person:
+    def __init__(self, name, age):  # hàm khởi tạo
+        self.name = name            # thuộc tính
+        self.age = age
+
+    def greet(self):                # phương thức
+        return f"Xin chào, tôi là {self.name}, {self.age} tuổi"
+
+p = Person("Long", 20)  # tạo object
+print(p.greet())        # Xin chào, tôi là Long, 20 tuổi
+```
+
+> **`self`** đại diện cho chính object đang gọi phương thức. Mọi phương thức instance đều có `self` làm tham số đầu tiên.
+
+---
+
+## 2. Class variable và Instance variable
+
+| Loại | Khai báo | Phạm vi |
+|------|----------|---------|
+| **Instance variable** | Trong `__init__` qua `self` | Riêng từng object |
+| **Class variable** | Trực tiếp trong class | Chung tất cả object |
+
+```python
+class Student:
+    school = "PTIT"       # class variable — dùng chung
+
+    def __init__(self, name):
+        self.name = name  # instance variable — riêng mỗi object
+
+s1 = Student("An")
+s2 = Student("Bình")
+
+Student.school = "VNU"    # thay đổi class variable → ảnh hưởng cả s1 và s2
+print(s1.school, s2.school)  # VNU VNU
+s1.name = "Cường"            # chỉ thay đổi s1
+print(s1.name, s2.name)      # Cường Bình
+```
+
+---
+
+## 3. Các phương thức đặc biệt (Dunder Methods)
+
+Các phương thức có dạng `__tên__` được Python tự động gọi trong các tình huống đặc biệt.
+
+### Khởi tạo và huỷ
+```python
+class Point:
+    def __init__(self, x, y):   # gọi khi tạo object
+        self.x = x
+        self.y = y
+
+    def __del__(self):           # gọi khi object bị xoá
+        print("Point deleted")
+
+    def __str__(self):           # gọi khi print(obj)
+        return f"({self.x}, {self.y})"
+
+    def __repr__(self):          # gọi khi debug / repr(obj)
+        return f"Point(x={self.x}, y={self.y})"
+
+p = Point(3, 4)
+print(p)         # (3, 4)
+```
+
+### Toán tử số học
+| Toán tử | Phương thức |
+|---------|-------------|
+| `+` | `__add__` |
+| `-` | `__sub__` |
+| `*` | `__mul__` |
+| `/` | `__truediv__` |
+| `//` | `__floordiv__` |
+| `%` | `__mod__` |
+| `**` | `__pow__` |
+
+```python
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+v1 = Vector(1, 2)
+v2 = Vector(3, 4)
+print(v1 + v2)   # (4, 6)
+```
+
+### Toán tử so sánh
+| Toán tử | Phương thức |
+|---------|-------------|
+| `==` | `__eq__` |
+| `!=` | `__ne__` |
+| `<` | `__lt__` |
+| `<=` | `__le__` |
+| `>` | `__gt__` |
+| `>=` | `__ge__` |
+
+```python
+class Student:
+    def __init__(self, score):
+        self.score = score
+
+    def __lt__(self, other):
+        return self.score < other.score
+
+a = Student(8)
+b = Student(9)
+print(a < b)    # True
+```
+
+### Container và Iterator
+```python
+class MyList:
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):        # len(obj)
+        return len(self.data)
+
+    def __getitem__(self, i): # obj[i]
+        return self.data[i]
+
+    def __contains__(self, x):# x in obj
+        return x in self.data
+
+ml = MyList([1, 2, 3])
+print(len(ml))    # 3
+print(ml[1])      # 2
+print(2 in ml)    # True
+```
+
+```python
+class Counter:
+    def __init__(self, n):
+        self.n = n
+        self.i = 0
+
+    def __iter__(self):   # trả về iterator
+        return self
+
+    def __next__(self):   # lấy phần tử tiếp theo
+        if self.i < self.n:
+            self.i += 1
+            return self.i
+        raise StopIteration
+
+for x in Counter(3):
+    print(x)   # 1, 2, 3
+```
+
+---
+
+## 4. Kế thừa (Inheritance)
+
+**Kế thừa** cho phép lớp con (subclass) sử dụng lại thuộc tính và phương thức của lớp cha (superclass), đồng thời có thể mở rộng hoặc ghi đè chúng.
+
+**Thuật ngữ:**
+- Lớp cha = superclass = base class = parent class
+- Lớp con = subclass = derived class = child class
+
+```
+class <tên lớp con>(<tên lớp cha>):
+    <nội dung>
+```
+
+```python
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        return "..."
+
+class Dog(Animal):
+    def __init__(self, name, breed):
+        super().__init__(name)  # gọi __init__ của lớp cha
+        self.breed = breed
+
+    def speak(self):            # ghi đè (override) phương thức cha
+        return "Gâu gâu!"
+
+dog = Dog("Lucky", "Husky")
+print(dog.name, dog.breed)  # Lucky Husky
+print(dog.speak())          # Gâu gâu!
+```
+
+### 4.1. Khởi tạo thuộc tính lớp cha với `super()`
+
+Khi lớp con có `__init__` riêng, cần gọi `super().__init__(...)` để khởi tạo các thuộc tính của lớp cha. Nếu lớp con không định nghĩa `__init__`, Python tự động dùng `__init__` của lớp cha.
+
+```python
+class Account:
+    def __init__(self, owner, balance=0):
+        self._owner = owner
+        self._balance = balance
+
+class CreditAccount(Account):
+    def __init__(self, owner, balance, limit):
+        super().__init__(owner, balance)  # khởi tạo thuộc tính của Account
+        self._limit = limit               # thuộc tính riêng của CreditAccount
+
+class SavingAccount(Account):
+    pass  # không có __init__ → tự dùng Account.__init__
+
+acc = CreditAccount("An", 1000, 5000)
+sav = SavingAccount("Bình", 2000)
+```
+
+### 4.2. Quy tắc tìm phương thức từ dưới lên (Bottom-Up Rule)
+
+Khi gọi `obj.method()`, Python tìm `method` theo thứ tự:
+1. Tìm trong class của chính `obj`
+2. Nếu không có, tìm lên lớp cha
+3. Tiếp tục lên các lớp trên cho đến khi tìm thấy
+4. Nếu không tìm thấy ở bất kỳ đâu → `AttributeError`
+
+```python
+class Account:
+    def deposit(self, amount):
+        self._balance += amount
+
+class InterestAccount(Account):
+    def addInterest(self, rate):
+        self.deposit(self._balance * rate)  # deposit tìm thấy ở Account
+
+acct = InterestAccount("An", 1000)
+acct.deposit(500)       # tìm ở InterestAccount → không có → tìm lên Account → có
+acct.addInterest(0.05)  # tìm ở InterestAccount → có
+```
+
+### 4.3. Phân cấp lớp (Class Hierarchy)
+
+Một lớp có thể là lớp cha của nhiều lớp con, tạo thành cây phân cấp:
+
+```
+Account
+├── DepositAccount
+│   └── InterestAccount
+└── CreditAccount
+```
+
+```python
+class Account:
+    def __init__(self, owner):
+        self._owner = owner
+        self._balance = 0.0
+
+class DepositAccount(Account):
+    def deposit(self, amount):
+        self._balance += amount
+
+class InterestAccount(DepositAccount):
+    def addInterest(self, rate):
+        self.deposit(self._balance * rate)
+
+class CreditAccount(Account):
+    def __init__(self, owner, limit):
+        super().__init__(owner)
+        self._limit = limit
+
+    def charge(self, amount):
+        if self._balance - amount < -self._limit:
+            print("Vượt hạn mức!")
+        else:
+            self._balance -= amount
+```
+
+### 4.4. Lớp `object` — gốc của mọi lớp
+
+Mọi class trong Python đều ngầm kế thừa từ `object`. Hai cách viết dưới đây tương đương nhau:
+
+```python
+class MyClass:        # thực chất là...
+    pass
+
+class MyClass(object): # ...giống hệt thế này
+    pass
+```
+
+Lớp `object` cung cấp các dunder method mặc định như `__str__`, `__eq__`, v.v. Khi ta tự định nghĩa các phương thức này trong class, ta đang **ghi đè** hành vi mặc định của `object`.
+
+### 4.5. Kiểm tra kiểu: `isinstance()` và `type()`
+
+| Hàm | Ý nghĩa |
+|-----|---------|
+| `isinstance(obj, C)` | `True` nếu `obj` là instance của `C` **hoặc bất kỳ lớp cha nào** của `C` |
+| `type(obj) == C` | `True` chỉ khi `obj` thuộc **đúng** class `C`, không tính lớp cha |
+
+```python
+acct = InterestAccount("An", 1000)
+
+isinstance(acct, InterestAccount)  # True
+isinstance(acct, DepositAccount)   # True  (lớp cha)
+isinstance(acct, Account)          # True  (lớp ông)
+isinstance(acct, CreditAccount)    # False (không liên quan)
+
+type(acct) == InterestAccount      # True
+type(acct) == Account              # False
+```
+
+> **Dùng `isinstance()` khi nào?** Hầu hết các trường hợp thực tế — nó linh hoạt hơn và phù hợp với nguyên tắc OOP. `type()` dùng khi cần phân biệt chính xác từng class.
+
+### 4.6. Ghi đè phương thức (Method Overriding)
+
+Lớp con định nghĩa lại phương thức đã có ở lớp cha → phương thức lớp con được dùng (theo quy tắc bottom-up).
+
+**Ghi đè hoàn toàn:**
+```python
+class Account:
+    def printStatement(self):
+        print(f"Chủ tài khoản: {self._owner}")
+        print(f"Số dư: {self._balance}")
+
+class CreditAccount(Account):
+    def printStatement(self):          # ghi đè
+        print(f"Chủ tài khoản: {self._owner}")
+        print(f"Số dư: {self._balance}")
+        print(f"Hạn mức: {self._limit}")  # thêm thông tin riêng
+```
+
+**Ghi đè kết hợp `super()` — tránh lặp code:**
+```python
+class CreditAccount(Account):
+    def printStatement(self):
+        super().printStatement()           # gọi phương thức của lớp cha
+        print(f"Hạn mức: {self._limit}")  # chỉ thêm phần riêng
+```
+
+> `super().<method>(<args>)` gọi phương thức của lớp cha nhưng vẫn dùng `self` là object hiện tại. Việc tìm kiếm phương thức bắt đầu từ lớp cha, không phải từ lớp hiện tại.
+
+### 4.7. Tương đương đối tượng: `==` và `is`
+
+| Toán tử | Ý nghĩa |
+|---------|---------|
+| `is` | Hai biến trỏ đến **cùng một object** (cùng địa chỉ bộ nhớ) |
+| `==` | Hai object có **giá trị tương đương** (có thể là hai object khác nhau) |
+
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p1 = Point(0, 0)
+p2 = Point(0, 0)
+
+p1 is p2    # False — hai object khác nhau
+p1 == p2    # False — mặc định object dùng `is` để so sánh
+```
+
+Mặc định, `==` với class tự định nghĩa hoạt động giống `is`. Để tùy chỉnh `==`, ghi đè `__eq__`:
+
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return type(other) == Point \
+            and self.x == other.x \
+            and self.y == other.y
+
+p1 = Point(0, 0)
+p2 = Point(0, 0)
+print(p1 == p2)   # True — cùng tọa độ
+print(p1 is p2)   # False — vẫn là hai object khác nhau
+```
+
+> **Lưu ý:** Trong `__eq__`, nên kiểm tra `type(other) == <Class>` trước khi truy cập thuộc tính để tránh lỗi khi so sánh với object khác loại.
+
+---
+
+## 5. Đóng gói (Encapsulation)
+
+| Tiền tố | Ý nghĩa | Ví dụ |
+|---------|---------|-------|
+| Không có | Công khai (public) | `self.name` |
+| `_` | Bán riêng tư (protected) — quy ước | `self._balance` |
+| `__` | Riêng tư (private) — Python đổi tên | `self.__secret` |
+
+```python
+class Account:
+    def __init__(self, balance):
+        self._balance = balance    # protected — dùng quy ước
+
+    def get_balance(self):
+        return self._balance
+
+    def deposit(self, amount):
+        if amount > 0:
+            self._balance += amount
+
+acc = Account(1000)
+print(acc.get_balance())   # 1000
+```
+
+---
+
+## 6. @property
+
+Cho phép truy cập phương thức **như thuộc tính** (không cần gọi `()`).
+
+```python
+class Circle:
+    def __init__(self, r):
+        self._r = r
+
+    @property
+    def area(self):
+        return 3.14 * self._r ** 2
+
+    @property
+    def radius(self):
+        return self._r
+
+    @radius.setter
+    def radius(self, value):
+        if value > 0:
+            self._r = value
+
+c = Circle(5)
+print(c.area)    # 78.5 — gọi như thuộc tính, không cần c.area()
+c.radius = 10    # gọi setter
+print(c.area)    # 314.0
+```
+
+---
+
+## 7. @classmethod và @staticmethod
+
+| Loại | Decorator | Tham số đầu | Truy cập |
+|------|-----------|-------------|---------|
+| Instance method | — | `self` | Thuộc tính instance và class |
+| Class method | `@classmethod` | `cls` | Chỉ class variable |
+| Static method | `@staticmethod` | Không có | Không truy cập class/instance |
+
+```python
+class MathUtils:
+    pi = 3.14
+
+    @classmethod
+    def circle_area(cls, r):    # cls là class MathUtils
+        return cls.pi * r * r
+
+    @staticmethod
+    def add(a, b):              # hàm tiện ích, không cần self/cls
+        return a + b
+
+print(MathUtils.circle_area(3))  # 28.26
+print(MathUtils.add(2, 5))       # 7
+```
+
+---
+
+## Tóm tắt nhanh
+
+| Khái niệm | Cú pháp |
+|-----------|---------|
+| Định nghĩa class | `class TênClass:` |
+| Hàm khởi tạo | `def __init__(self, ...):` |
+| Kế thừa | `class Con(Cha):` |
+| Gọi hàm cha | `super().__init__(...)` |
+| In object | `def __str__(self):` |
+| Cộng hai object | `def __add__(self, other):` |
+| Thuộc tính tính toán | `@property` |
+| Phương thức lớp | `@classmethod` |
+| Phương thức tĩnh | `@staticmethod` |
+
+
+---
+
+# Ngoại lệ (Exception) trong Python
+
+**Ngoại lệ** là lỗi xảy ra trong lúc chạy chương trình. Python cho phép **bắt** và **xử lý** ngoại lệ thay vì để chương trình bị dừng đột ngột.
+
+---
+
+## 1. Cấu trúc try – except – else – finally
+
+```
+try:
+    <code có thể gây lỗi>
+except <LoạiLỗi>:
+    <xử lý khi có lỗi>
+else:
+    <chạy khi KHÔNG có lỗi>
+finally:
+    <luôn luôn chạy dù có lỗi hay không>
+```
+
+```python
+try:
+    x = int(input("Nhập số: "))
+    print(10 / x)
+except ValueError:
+    print("Không phải số nguyên!")
+except ZeroDivisionError:
+    print("Không chia được cho 0!")
+else:
+    print("Tính toán thành công.")
+finally:
+    print("Kết thúc.")  # luôn chạy
+```
+
+---
+
+## 2. Các loại ngoại lệ thường gặp
+
+| Ngoại lệ | Nguyên nhân |
+|----------|-------------|
+| `ValueError` | Giá trị không hợp lệ (vd: `int("abc")`) |
+| `TypeError` | Sai kiểu dữ liệu (vd: `"a" + 1`) |
+| `ZeroDivisionError` | Chia cho 0 |
+| `IndexError` | Chỉ số ngoài phạm vi list |
+| `KeyError` | Key không tồn tại trong dict |
+| `FileNotFoundError` | Không tìm thấy file |
+| `AttributeError` | Object không có thuộc tính/phương thức đó |
+| `NameError` | Biến chưa được khai báo |
+
+```python
+# Bắt nhiều loại lỗi cùng lúc
+try:
+    lst = [1, 2, 3]
+    print(lst[10])
+except (IndexError, KeyError) as e:
+    print(f"Lỗi truy cập: {e}")
+```
+
+---
+
+## 3. raise — tự ném ngoại lệ
+
+Dùng `raise` để **tự ném lỗi** khi đầu vào không hợp lệ.
+
+```python
+def max_and_min(nums):
+    if len(nums) == 0:
+        raise ValueError("Danh sách không được rỗng")
+    return max(nums), min(nums)
+
+def three_smallest(nums):
+    if len(nums) < 3:
+        raise ValueError("Cần ít nhất 3 phần tử")
+    return sorted(nums)[:3]
+
+try:
+    max_and_min([])
+except ValueError as e:
+    print(e)   # Danh sách không được rỗng
+```
+
+---
+
+## 4. Ngoại lệ tự định nghĩa (Custom Exception)
+
+Tạo lớp ngoại lệ riêng bằng cách kế thừa từ `Exception`.
+
+```python
+class AgeError(Exception):
+    pass
+
+class NegativeValueError(Exception):
+    def __init__(self, value):
+        super().__init__(f"Giá trị âm không hợp lệ: {value}")
+        self.value = value
+
+def set_age(age):
+    if age < 0:
+        raise NegativeValueError(age)
+    if age > 150:
+        raise AgeError("Tuổi không hợp lệ")
+    return age
+
+try:
+    set_age(-5)
+except NegativeValueError as e:
+    print(e)   # Giá trị âm không hợp lệ: -5
+```
+
+---
+
+## 5. Kết hợp Exception với Class
+
+```python
+class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("Số tiền rút phải lớn hơn 0")
+        if amount > self.balance:
+            raise ValueError("Số dư không đủ")
+        self.balance -= amount
+
+acc = BankAccount("Long", 1000)
+try:
+    acc.withdraw(2000)
+except ValueError as e:
+    print(e)   # Số dư không đủ
+```
+
+---
+
+## Tóm tắt nhanh
+
+| Cú pháp | Ý nghĩa |
+|---------|---------|
+| `try: ... except E:` | Bắt ngoại lệ loại E |
+| `except E as e:` | Lấy thông tin lỗi vào biến e |
+| `except (E1, E2):` | Bắt nhiều loại lỗi |
+| `else:` | Chạy khi không có lỗi |
+| `finally:` | Luôn chạy dù có lỗi hay không |
+| `raise E(msg)` | Ném ngoại lệ thủ công |
+| `class MyErr(Exception):` | Tạo ngoại lệ tự định nghĩa |
+
+
+---
+
+# Đọc/Ghi File (File I/O) trong Python
+
+Python cho phép đọc và ghi file văn bản (`.txt`, `.csv`,...) và file nhị phân.
+
+---
+
+## 1. Mở file — hàm `open()`
+
+```python
+f = open("ten_file.txt", mode)
+# ... làm việc với f ...
+f.close()  # phải đóng file sau khi dùng
+```
+
+### Các chế độ mở file (mode)
+
+| Mode | Ý nghĩa |
+|------|---------|
+| `"r"` | Đọc (mặc định). Lỗi nếu file không tồn tại |
+| `"w"` | Ghi (tạo mới hoặc xoá nội dung cũ) |
+| `"a"` | Ghi tiếp (append) vào cuối file |
+| `"x"` | Tạo file mới. Lỗi nếu file đã tồn tại |
+| `"r+"` | Đọc và ghi |
+| `"rb"`, `"wb"` | Đọc/ghi file nhị phân |
+
+---
+
+## 2. Dùng `with` — cách khuyến nghị
+
+`with` tự động đóng file khi ra khỏi khối lệnh, kể cả khi có lỗi.
+
+```python
+with open("data.txt", "r", encoding="utf-8") as f:
+    noi_dung = f.read()
+    print(noi_dung)
+# file tự đóng ở đây
+```
+
+> **Luôn dùng `encoding="utf-8"`** khi làm việc với file tiếng Việt.
+
+---
+
+## 3. Đọc file
+
+```python
+# Đọc toàn bộ nội dung thành 1 chuỗi
+with open("data.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+
+# Đọc từng dòng vào list
+with open("data.txt", "r", encoding="utf-8") as f:
+    lines = f.readlines()   # ["dòng 1\n", "dòng 2\n", ...]
+
+# Duyệt từng dòng (tiết kiệm bộ nhớ)
+with open("data.txt", "r", encoding="utf-8") as f:
+    for line in f:
+        print(line.strip())  # strip() bỏ ký tự xuống dòng \n
+```
+
+---
+
+## 4. Ghi file
+
+```python
+# Ghi đè (tạo mới hoặc xoá nội dung cũ)
+with open("output.txt", "w", encoding="utf-8") as f:
+    f.write("Dòng 1\n")
+    f.write("Dòng 2\n")
+
+# Ghi nhiều dòng cùng lúc
+lines = ["Táo\n", "Chuối\n", "Cam\n"]
+with open("output.txt", "w", encoding="utf-8") as f:
+    f.writelines(lines)
+
+# Ghi tiếp vào cuối file (không xoá nội dung cũ)
+with open("output.txt", "a", encoding="utf-8") as f:
+    f.write("Thêm dòng mới\n")
+```
+
+---
+
+## 5. Xử lý lỗi khi làm việc với file
+
+```python
+try:
+    with open("khong_ton_tai.txt", "r", encoding="utf-8") as f:
+        content = f.read()
+except FileNotFoundError:
+    print("File không tồn tại!")
+except PermissionError:
+    print("Không có quyền đọc file!")
+```
+
+---
+
+## 6. Ví dụ thực tế — đọc và xử lý dữ liệu
+
+```python
+# Đọc danh sách điểm từ file, tính trung bình
+def doc_diem(ten_file):
+    diem = []
+    try:
+        with open(ten_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    diem.append(float(line))
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Không tìm thấy file: {ten_file}")
+    return diem
+
+def ghi_ket_qua(ten_file, diem):
+    with open(ten_file, "w", encoding="utf-8") as f:
+        for d in diem:
+            ket_qua = "Đậu" if d >= 5 else "Rớt"
+            f.write(f"{d} - {ket_qua}\n")
+        f.write(f"Trung bình: {sum(diem)/len(diem):.2f}\n")
+```
+
+---
+
+## Tóm tắt nhanh
+
+| Thao tác | Code |
+|----------|------|
+| Mở và đọc toàn bộ | `f.read()` |
+| Đọc từng dòng | `f.readlines()` hoặc `for line in f` |
+| Ghi chuỗi | `f.write(chuoi)` |
+| Ghi nhiều dòng | `f.writelines(list)` |
+| Mở an toàn | `with open(...) as f:` |
+| Đọc không lỗi | `try/except FileNotFoundError` |
